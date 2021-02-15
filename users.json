@@ -1,0 +1,17 @@
+[
+    {
+      "username": "user1",
+      "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMU+puWEPCwVLmxgLezXNXtywYsKOOhDjzxyuixb/i6W user1@example.com",
+      "allowed_hosts": ["web", "db", "cache"]
+    },
+    {
+      "username": "user2",
+      "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOZsl7L2yBS9qfNmaneeszb231q8PJzgpEDXNU0II3GC user2@example.com",
+      "allowed_hosts": ["web"]
+    },
+    {
+      "username": "user3",
+      "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJFWGJkgajTL2t3co1wYR8+XUXZYNYwFqGEFOEka1GLB user3@example.com",
+      "allowed_hosts": []
+    }
+  ]
