@@ -139,8 +139,8 @@ resource "local_file" "public_key_openssh" {
 
 resource "local_file" "private_key_pem" {
   depends_on = ["tls_private_key.default"]
-  content    = "${tls_private_key.default.private_key_pem}"
-  filename   = "${local.private_key_filename}"
+  content    = tls_private_key.default.private_key_pem
+  filename   = local.private_key_filename
 }
 
 resource "null_resource" "chmod" {
@@ -148,5 +148,34 @@ resource "null_resource" "chmod" {
 
   provisioner "local-exec" {
     command = "chmod 400 ${local.private_key_filename}"
+  }
+}
+
+resource "null_resource" "users" {
+  for_each = var.users
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "remote-exec" {
+    on_failure = continue
+
+    inline = [
+      "sudo adduser --disabled-password ${each.key}",
+      "sudo mkdir -p /home/${each.key}/.ssh",
+      "sudo echo '${each.value}' > /home/${each.key}/.ssh/authorized_keys",
+      "sudo chown -R ${each.value}:${each.value} /home/${each.value}/.ssh",
+      "sudo chmod 700 /home/${each.value}/.ssh",
+      "sudo chmod 600 /home/${each.value}/.ssh/authorized_keys",
+      "sudo usermod -aG sudo ${each.value}"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = aws_instance.vm.public_ip
+      private_key = file(local.private_key_filename)
+    }
   }
 }

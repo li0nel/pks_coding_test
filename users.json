@@ -1,7 +1,7 @@
 [
     {
-      "username": "user1",
-      "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMU+puWEPCwVLmxgLezXNXtywYsKOOhDjzxyuixb/i6W user1@example.com",
+      "username": "lionel",
+      "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXqX5lAUfDvotelFORWILlLguXmXhi29+phBen/fASIw2xIcYv0nA+nEAjkQzs727z+V4SJ+byWLmEeyqmGydY0kWZjiCc+9Vs8j/xsCMax+ItsFWC3qqLA4E+oPD6O6sMUao04AvYiIdxGxz4+Cwz+v3W37QzU9F2v+AhtWQTv+RasBqV9QeKFH8DsseoECmwZqDXMAjMRuGoeKMI0slL6FnKSbwEYJtnx8gvHWleXpPKESfKBJFiJIEYWBWOVVGpeST2t8srwLLT04pUKnO6OS7aSAJeQ2FBo61wvSGMEqrg2uPSj70e9yg8J/lotcP51/5NKhzD24WAgqogwpWx lionel@a440.io",
       "allowed_hosts": ["web", "db", "cache"]
     },
     {

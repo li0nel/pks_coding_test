@@ -5,3 +5,7 @@ output "ec2_ip" {
 output "ssh_key_path" {
   value = "${local.private_key_filename}"
 }
+
+output "users" {
+  value = var.users
+}
