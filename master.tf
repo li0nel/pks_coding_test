@@ -20,8 +20,13 @@ provider "aws" {
   version = "~> 1.9"
 }
 
-data "external" "example" {
-  program = ["cat", "${path.module}/file.json"]
+data "external" "users" {
+  program = ["cat", "${path.module}/users.json"]
+  query   = {}
+}
+
+data "external" "hosts" {
+  program = ["cat", "${path.module}/hosts.json"]
   query   = {}
 }
 

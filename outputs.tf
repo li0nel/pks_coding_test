@@ -1,3 +1,7 @@
-output "ec2" {
-  value = module.ec2
+output "users" {
+  value = data.external.users
+}
+
+output "hosts" {
+  value = data.external.hosts
 }
