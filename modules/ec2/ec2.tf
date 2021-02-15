@@ -1,10 +1,3 @@
-variable "stack_name" {}
-variable "public_subnet_id" {}
-variable "vpc_id" {}
-variable "s3_bucket_arn" {}
-
-variable "public_ips" { type = "map" }
-
 locals {
   use_eip   = "${length(lookup(var.public_ips, terraform.workspace, "")) > 0}"
 }
@@ -35,26 +28,26 @@ data "aws_ami" "ubuntu" {
 resource "aws_eip_association" "proxy_eip" {
   count         = "${local.use_eip == true ? 1 : 0}"
   instance_id   = "${aws_instance.vm.id}"
-  allocation_id = "${data.aws_eip.ec2_ip.id}"
+  allocation_id = "${data.aws_eip.ec2_ip[count.index].id}"
 }
 
 resource "aws_instance" "vm" {
   ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.medium"
+  instance_type               = "t2.nano"
   associate_public_ip_address = true
   key_name                    = "${aws_key_pair.generated.key_name}"
   vpc_security_group_ids      = ["${aws_security_group.ec2_security_group.id}"]
   subnet_id                   = "${var.public_subnet_id}"
   iam_instance_profile        = "${aws_iam_instance_profile.vm_profile.name}"
 
-  tags {
-    Name = "${var.stack_name}"
+  tags = {
+    Name = var.stack_name
   }
 }
 
 resource "aws_security_group" "ec2_security_group" {
   name   = "${var.stack_name}-ec2"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
   ingress {
     protocol    = "tcp"
@@ -91,8 +84,8 @@ resource "aws_security_group" "ec2_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
-    Name = "${var.stack_name}"
+  tags = {
+    Name = var.stack_name
   }
 }
 
@@ -122,40 +115,10 @@ resource "aws_iam_role" "role" {
 EOF
 }
 
-resource "aws_iam_role_policy" "ec2_role_policy" {
-  name = "ec2-policy-${var.stack_name}"
-  role = "${aws_iam_role.role.id}"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-      {
-         "Effect": "Allow",
-         "Action": [
-            "logs:*"
-         ],
-         "Resource": [
-            "*"
-         ]
-      },
-      {
-         "Effect": "Allow",
-         "Action": [
-            "s3:*"
-         ],
-         "Resource": [
-            "${var.s3_bucket_arn}"
-         ]
-      }
-  ]
-}
-EOF
-}
-
 locals {
-  public_key_filename  = "./key-${terraform.workspace}.pub"
-  private_key_filename = "./key-${terraform.workspace}"
+  key_name = "key-${var.stack_name}-${terraform.workspace}"
+  private_key_filename  = join("", ["./", local.key_name])
+  public_key_filename = join("", [local.private_key_filename, ".pub"])
 }
 
 resource "tls_private_key" "default" {
@@ -164,7 +127,7 @@ resource "tls_private_key" "default" {
 
 resource "aws_key_pair" "generated" {
   depends_on = ["tls_private_key.default"]
-  key_name   = "key-${var.stack_name}-${terraform.workspace}"
+  key_name   = local.key_name
   public_key = "${tls_private_key.default.public_key_openssh}"
 }
 
